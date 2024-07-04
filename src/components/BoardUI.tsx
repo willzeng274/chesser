@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Board } from "../utils/chess";
+import { Board, initAttacks } from "../utils/chess";
 import { Chessground } from "chessground";
 import "./chessground.base.css";
 // import {Side} from "../utils/chess/constants"
 
 import type { Api } from "chessground/api";
+// import { initAttacks } from "../utils/chess/attacks";
+import useEffectOnce from "../utils/useEffectOnce";
+// import { bishopAttacks, bishopMasks, kingAttacks, knightAttacks, pawnAttacks, rookAttacks, rookMasks } from "../utils/chess/attacks";
 // import type { Config } from 'chessground/config';
 
 export default function BoardUI() {
@@ -12,8 +15,23 @@ export default function BoardUI() {
 
 	const ref = useRef<HTMLDivElement>(null);
 
+	useEffectOnce(() => {
+		const ds = Date.now();
+		initAttacks();
+		console.log("Init attacks took: ", Date.now() - ds);
+		// console.log({
+		// 	pawnAttacks,
+		// 	kingAttacks,
+		// 	bishopAttacks,
+		// 	rookAttacks,
+		// 	knightAttacks,
+		// 	bishopMasks,
+		// 	rookMasks,
+		// });
+	}, []);
+
 	useEffect(() => {
-		console.log(ref, ref.current, api);
+		// console.log(ref, ref.current, api);
 		if (ref && ref.current && !api) {
 			const board = Board.startingPosition();
 			// const board = new BitBoard(0x0000001818000000n);
@@ -28,12 +46,12 @@ export default function BoardUI() {
 				// animation: { enabled: true, duration: 200 },
 				fen: board.toFen(),
 			});
-			console.log(chessgroundApi);
+			// console.log(chessgroundApi);
 			setApi(chessgroundApi);
 		} else if (ref && ref.current && api) {
 			api.set({});
 		}
-	}, [ref]);
+	}, [ref, api]);
 
 	return <div ref={ref} style={{ width: "500px", height: "500px" }}></div>;
 }

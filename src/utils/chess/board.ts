@@ -1,9 +1,12 @@
+import { getBishopAttacks, getQueenAttacks, getRookAttacks, kingAttacks, knightAttacks, pawnAttacks } from "./attacks";
 import { BitBoard } from "./bitboard";
 import {
     Side, PieceType, CastlingRights,
     // oppositeSide,
-    unicodePieces, asciiPieces, PieceTypeValues
+    unicodePieces, asciiPieces, PieceTypeValues,
+    oppositeSide
 } from "./constants";
+import { getLs1bIndex } from "./utils";
 // import { getLs1bIndex } from "./utils";
 
 // interface BitBoards {
@@ -164,13 +167,13 @@ export class Board {
     get allPieces(): BitBoard { return this.whitePieces.union(this.blackPieces) }
 
 
-    // get isCheck() {
-    //     return this.isSquareAttacked(
-    //         getLs1bIndex(this.turn === Side.white
-    //             ? this.pieceBitBoards.get(PieceType.wKing)!.value
-    //             : this.pieceBitBoards.get(PieceType.bKing)!.value),
-    //         oppositeSide(this.turn));
-    // };
+    get isCheck() {
+        return this.isSquareAttacked(
+            getLs1bIndex(this.turn === Side.white
+                ? this.pieceBitBoards.get(PieceType.wKing)!.value
+                : this.pieceBitBoards.get(PieceType.bKing)!.value),
+            oppositeSide(this.turn));
+    }
 
     piecesOf(side: Side) {
         return side === Side.white ? this.whitePieces : this.blackPieces;
@@ -278,6 +281,59 @@ export class Board {
         fen += `${this.movesPlayed}`;
 
         return fen;
+    }
+
+    isSquareAttacked(square: bigint, side: Side): boolean {
+        const pieceBitBoards = this.pieceBitBoards;
+        const squareNum = Number(square);
+        // attacked by white pawns
+        if ((side === Side.white) &&
+            (pawnAttacks[1][squareNum] & pieceBitBoards.get(PieceType.wPawn)!.value) !== 0n) {
+            return true;
+        }
+
+        // attacked by black pawns
+        if ((side == Side.black) &&
+            (pawnAttacks[0][squareNum] & pieceBitBoards.get(PieceType.bPawn)!.value) !== 0n) {
+            return true;
+        }
+
+        // attacked by knights
+        if ((knightAttacks[squareNum] &
+            ((side === Side.white)
+                ? pieceBitBoards.get(PieceType.wKnight)!.value
+                : pieceBitBoards.get(PieceType.bKnight)!.value)) !== 0n) return true;
+
+        // attacked by bishops
+        if ((getBishopAttacks(square, this.allPieces).intersect(
+            ((side === Side.white)
+                ? pieceBitBoards.get(PieceType.wBishop)!
+                : pieceBitBoards.get(PieceType.bBishop)!)))
+            .notEmpty) return true;
+
+        // attacked by rooks
+        if ((getRookAttacks(square, this.allPieces).intersect(
+            ((side === Side.white)
+                ? pieceBitBoards.get(PieceType.wRook)!
+                : pieceBitBoards.get(PieceType.bRook)!)))
+            .notEmpty) return true;
+
+        // attacked by bishops
+        if ((getQueenAttacks(square, this.allPieces).intersect(
+            ((side === Side.white)
+                ? pieceBitBoards.get(PieceType.wQueen)!
+                : pieceBitBoards.get(PieceType.bQueen)!)))
+            .notEmpty) return true;
+
+        // attacked by kings
+        if ((kingAttacks[squareNum] &
+            ((side === Side.white)
+                ? pieceBitBoards.get(PieceType.wKing)!.value
+                : pieceBitBoards.get(PieceType.bKing)!.value))
+            !== 0n) return true;
+
+        // by default return false
+        return false;
     }
 
     // No Need for now

@@ -1,7 +1,5 @@
-import { assert, ushr } from "..";
+import { assert, urs } from "..";
 import "./constants.ts";
-
-
 
 export class BitBoard {
     value: bigint;
@@ -20,30 +18,31 @@ export class BitBoard {
     static readonly backranks = new BitBoard(0xff000000000000ffn);
 
     setBit(square: bigint): BitBoard {
-        assert(square >= 0 && square < 64);
+        assert(square >= 0n && square < 64n);
         return new BitBoard(this.value | (1n << square));
     }
 
     getBit(square: bigint): bigint {
-        assert(square >= 0 && square < 64);
+        assert(square >= 0n && square < 64n);
         return (this.value >> square) & 1n;
     }
 
     has(square: bigint): boolean {
-        assert(square >= 0 && square < 64);
+        assert(square >= 0n && square < 64n);
         return this.getBit(square) === 1n;
     }
 
     popBit(square: bigint): BitBoard {
-        assert(square >= 0 && square < 64);
+        assert(square >= 0n && square < 64n);
 
         return new BitBoard(this.value & ~(1n << (square)));
     }
 
     /// Bitwise right shift, operator >>
+    // actually doing unsigned right shift
     shr(shift: bigint): BitBoard {
         if (shift >= 64n) return new BitBoard(0n);
-        if (shift > 0n) return new BitBoard(ushr(this.value, shift));
+        if (shift > 0n) return new BitBoard(urs(this.value, shift));
         return this;
     }
 
@@ -126,3 +125,17 @@ export class BitBoard {
         }
     }
 }
+
+// Bitboard constants
+
+// Represents a board with all bits set to 1 except the bits in the A file
+export const NOT_A_FILE = new BitBoard(0xFEFEFEFEFEFEFEFEn);
+
+// A board with all bits set to 1 except the bits in the A file and the B file
+export const NOT_AB_FILE = new BitBoard(0xFCFCFCFCFCFCFCFCn);
+
+// Board with all bits set to 1 except the bits in the H file
+export const NOT_H_FILE = new BitBoard(0x7F7F7F7F7F7F7F7Fn);
+
+// A board with all bits set to 1 except the bits in the H file and the G file
+export const NOT_HG_FILE = new BitBoard(0x3F3F3F3F3F3F3F3Fn);
