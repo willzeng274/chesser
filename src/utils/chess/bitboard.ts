@@ -1,141 +1,128 @@
-export class PieceType {
-        const wPawn = 0;
-        const wKnight = 1;
-        const wBishop = 2;
-        const wRook = 3;
-        const wQueen = 4;
-        const wKing = 5;
-      
-        const bPawn = 6;
-        const bKnight = 7;
-        const bBishop = 8;
-        const bRook = 9;
-        const bQueen = 1;,
-        const bKing = 1;,
+import { assert, ushr } from "..";
+import "./constants.ts";
 
-        
-        public get value() : string {
-            return [wPawn, wKnight, wBishop, wRook, wQueen, wKing],
-        }
-}
+
 
 export class BitBoard {
-    /*
-    BitBoard | BitBoard is union, combines all of the bits
-    BitBoard & BitBoard is interection, if both bits are 1 the result is 1 else 0
-    */
-    value: BigInt;
-    pieceType: PieceType;
-    const BitBoard(this.value, {this.pieceType});
-  
-    static const full = BitBoard(0xffffffffffffffff);
-    static const lightSquares = BitBoard(0x55AA55AA55AA55AA);
-    static const darkSquares = BitBoard(0xAA55AA55AA55AA55);
-    static const diagonal = BitBoard(0x8040201008040201);
-    static const antidiagonal = BitBoard(0x0102040810204080);
-    static const corners = BitBoard(0x8100000000000081);
-    static const center = BitBoard(0x0000001818000000);
-    static const backranks = BitBoard(0xff000000000000ff);
-  
-    BitBoard setBit(int square) {
-      assert(square >= 0 && square < 64);
-      return BitBoard(value | (1 << square));
+    value: bigint;
+
+    constructor(value: bigint) {
+        this.value = value;
     }
-  
-    int getBit(int square) {
-      assert(square >= 0 && square < 64);
-      return (value >> square) & 1;
+
+    static readonly full = new BitBoard(0xffffffffffffffffn);
+    static readonly lightSquares = new BitBoard(0x55AA55AA55AA55AAn);
+    static readonly darkSquares = new BitBoard(0xAA55AA55AA55AA55n);
+    static readonly diagonal = new BitBoard(0x8040201008040201n);
+    static readonly antidiagonal = new BitBoard(0x0102040810204080n);
+    static readonly corners = new BitBoard(0x8100000000000081n);
+    static readonly center = new BitBoard(0x0000001818000000n);
+    static readonly backranks = new BitBoard(0xff000000000000ffn);
+
+    setBit(square: bigint): BitBoard {
+        assert(square >= 0 && square < 64);
+        return new BitBoard(this.value | (1n << square));
     }
-  
-    bool has(int square) {
-      assert(square >= 0 && square < 64);
-      return getBit(square) == 1;
+
+    getBit(square: bigint): bigint {
+        assert(square >= 0 && square < 64);
+        return (this.value >> square) & 1n;
     }
-  
-    BitBoard popBit(int square) {
-      assert(square >= 0 && square < 64);
-  
-      return BitBoard(value & ~(1 << (square)));
+
+    has(square: bigint): boolean {
+        assert(square >= 0 && square < 64);
+        return this.getBit(square) === 1n;
     }
-  
-    /// Bitwise right shift
-    BitBoard shr(int shift) {
-      if (shift >= 64) return BitBoard(0);
-      if (shift > 0) return BitBoard(value >>> shift);
-      return this;
+
+    popBit(square: bigint): BitBoard {
+        assert(square >= 0 && square < 64);
+
+        return new BitBoard(this.value & ~(1n << (square)));
     }
-  
-    BitBoard operator >>(int shift) => shr(shift);
-  
-    /// Bitwise left shift
-    BitBoard shl(int shift) {
-      if (shift >= 64) return BitBoard(0);
-      if (shift > 0) return BitBoard(value << shift);
-      return this;
+
+    /// Bitwise right shift, operator >>
+    shr(shift: bigint): BitBoard {
+        if (shift >= 64n) return new BitBoard(0n);
+        if (shift > 0n) return new BitBoard(ushr(this.value, shift));
+        return this;
     }
-  
-    BitBoard operator <<(int shift) => shl(shift);
-  
-    BitBoard operator -() => BitBoard(-value);
-  
-    BitBoard xor(BitBoard other) => BitBoard(value ^ other.value);
-    BitBoard operator ^(BitBoard other) => BitBoard(value ^ other.value);
-  
-    BitBoard union(BitBoard other) => BitBoard(value | other.value);
-    BitBoard operator |(BitBoard other) => BitBoard(value | other.value);
-  
-    BitBoard intersect(BitBoard other) => BitBoard(value & other.value);
-    BitBoard operator &(BitBoard other) => BitBoard(value & other.value);
-  
-    BitBoard minus(BitBoard other) => BitBoard(value - other.value);
-    BitBoard operator -(BitBoard other) => BitBoard(value - other.value);
-  
-    BitBoard operator ~() => BitBoard(~value);
-    BitBoard complement() => BitBoard(~value);
-  
-    BitBoard operator *(int other) => BitBoard(value * other);
-  
-    BitBoard diff(BitBoard other) => BitBoard(value & ~other.value);
-  
-    @override
-    bool operator ==(Object other) {
-      return identical(this, other) ||
-          other is BitBoard &&
-              other.runtimeType == runtimeType &&
-              other.value == value;
+
+    /// Bitwise left shift, operator <<
+    shl(shift: bigint): BitBoard {
+        if (shift >= 64n) return new BitBoard(0n);
+        if (shift > 0n) return new BitBoard(this.value << shift);
+        return this;
     }
-  
-    @override
-    int get hashCode => value.hashCode;
-  
-    @override
-    String toString() {
-      return "BitBoard($value)";
+
+    neg(): BitBoard {
+        return new BitBoard(-this.value);
     }
-  
-    bool get notEmpty => value != 0;
-  
-    printBoard({bool showBoardValue = true}) {
-      print('');
-  
-      for (var rank = 0; rank < 8; rank++) {
-        for (var file = 0; file < 8; file++) {
-          final square = rank * 8 + file;
-  
-          if (file == 0) {
-            stdout.write("${8 - rank}  | ");
-          }
-  
-          stdout.write('${getBit(square)} ');
+
+    xor(other: BitBoard): BitBoard {
+        return new BitBoard(this.value ^ other.value);
+    }
+
+    union(other: BitBoard): BitBoard {
+        return new BitBoard(this.value | other.value);
+    }
+
+    intersect(other: BitBoard): BitBoard {
+        return new BitBoard(this.value & other.value);
+    }
+
+    minus(other: BitBoard): BitBoard {
+        return new BitBoard(this.value - other.value);
+    }
+
+    complement(): BitBoard {
+        return new BitBoard(~this.value);
+    }
+
+    multiply(other: bigint): BitBoard {
+        return new BitBoard(this.value * other);
+    }
+
+    diff(other: BitBoard): BitBoard {
+        return new BitBoard(this.value & ~other.value);
+    }
+
+    equals(other: object): boolean {
+        return this === other ||
+            other instanceof BitBoard &&
+            other.value === this.value;
+    }
+
+    toString(): string {
+        return `BitBoard(${this.value})`;
+    }
+
+    get notEmpty(): boolean {
+        return this.value !== 0n;
+    }
+
+    printBoard(showBoardValue = false) {
+        let buffer = '';
+
+        for (let rank = 0n; rank < 8n; rank++) {
+            for (let file = 0n; file < 8n; file++) {
+                const square = rank * 8n + file;
+
+                if (file === 0n) {
+                    buffer += (`${8n - rank}  | `);
+                }
+
+                buffer += this.getBit(square).toString() + ' ';
+            }
+            buffer += '\n';
         }
-        stdout.write('\n');
-      }
-  
-      stdout.write('   ------------------');
-      stdout.write('\n     a b c d e f g h\n');
-      if (showBoardValue) {
-        print('\nBitBoard Value: $value\n');
-      }
+
+        buffer += '   ------------------';
+        buffer += '\n     a b c d e f g h\n';
+
+        console.log(buffer);
+
+        if (showBoardValue) {
+            console.log(`\nBitBoard Value: ${this.value}\n`);
+        }
     }
-  }
-  
+}
