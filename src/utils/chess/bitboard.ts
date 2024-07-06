@@ -1,11 +1,17 @@
 import { assert, urs } from "..";
 import "./constants.ts";
+import { PieceTypeValues, Side } from "./constants.ts";
 
 export class BitBoard {
     value: bigint;
 
     constructor(value: bigint) {
-        this.value = value;
+        this.value = (
+            value === (-1n << 64n) ||
+            value === (1n << 64n)
+            // value === (1n << 63n) ||
+            // value === (-1n << 63n)
+        ) ? 0n : value;
     }
 
     static readonly full = new BitBoard(0xffffffffffffffffn);
@@ -34,7 +40,11 @@ export class BitBoard {
 
     popBit(square: bigint): BitBoard {
         assert(square >= 0n && square < 64n);
-
+        if (square === 56n) {
+            console.log("popping bit", ~(1n << (square)));
+            console.log("this.value", this.value);
+            console.log("AND", this.value & ~(1n << (square)));
+        }
         return new BitBoard(this.value & ~(1n << (square)));
     }
 
@@ -123,6 +133,36 @@ export class BitBoard {
         if (showBoardValue) {
             console.log(`\nBitBoard Value: ${this.value}\n`);
         }
+    }
+}
+
+export interface BoardCopyArgs {
+    pieceBitBoards: Map<PieceTypeValues, BitBoard>;
+    turn: Side;
+    castlingRights: bigint;
+    enPassant: bigint | undefined;
+    numOfMovesPlayed: bigint;
+}
+
+export class BoardCopy {
+    pieceBitBoards: Map<PieceTypeValues, BitBoard>;
+    turn: Side;
+    castlingRights: bigint;
+    enPassant: bigint | undefined;
+    numOfMovesPlayed: bigint;
+
+    constructor({
+        pieceBitBoards,
+        turn,
+        castlingRights,
+        enPassant,
+        numOfMovesPlayed
+    }: BoardCopyArgs) {
+        this.pieceBitBoards = pieceBitBoards;
+        this.turn = turn;
+        this.castlingRights = castlingRights;
+        this.enPassant = enPassant;
+        this.numOfMovesPlayed = numOfMovesPlayed;
     }
 }
 

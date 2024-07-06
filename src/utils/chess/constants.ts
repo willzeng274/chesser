@@ -85,28 +85,28 @@ export abstract class CastlingRights {
 }
 
 export class PieceType {
-    static wPawn: PieceTypeValues = 0;
-    static wKnight: PieceTypeValues = 1;
-    static wBishop: PieceTypeValues = 2;
-    static wRook: PieceTypeValues = 3;
-    static wQueen: PieceTypeValues = 4;
-    static wKing: PieceTypeValues = 5;
+    static readonly wPawn: PieceTypeValues = 0;
+    static readonly wKnight: PieceTypeValues = 1;
+    static readonly wBishop: PieceTypeValues = 2;
+    static readonly wRook: PieceTypeValues = 3;
+    static readonly wQueen: PieceTypeValues = 4;
+    static readonly wKing: PieceTypeValues = 5;
 
-    static bPawn: PieceTypeValues = 6;
-    static bKnight: PieceTypeValues = 7;
-    static bBishop: PieceTypeValues = 8;
-    static bRook: PieceTypeValues = 9;
-    static bQueen: PieceTypeValues = 10;
-    static bKing: PieceTypeValues = 11;
+    static readonly bPawn: PieceTypeValues = 6;
+    static readonly bKnight: PieceTypeValues = 7;
+    static readonly bBishop: PieceTypeValues = 8;
+    static readonly bRook: PieceTypeValues = 9;
+    static readonly bQueen: PieceTypeValues = 10;
+    static readonly bKing: PieceTypeValues = 11;
 
-    whitePieces = [PieceType.wPawn, PieceType.wKnight, PieceType.wBishop, PieceType.wRook, PieceType.wQueen, PieceType.wKing];
-    blackPieces = [PieceType.bPawn, PieceType.bKnight, PieceType.bBishop, PieceType.bRook, PieceType.bQueen, PieceType.bKing];
+    static readonly whitePieces = [PieceType.wPawn, PieceType.wKnight, PieceType.wBishop, PieceType.wRook, PieceType.wQueen, PieceType.wKing];
+    static readonly blackPieces = [PieceType.bPawn, PieceType.bKnight, PieceType.bBishop, PieceType.bRook, PieceType.bQueen, PieceType.bKing];
 
-    side(idx: number): boolean {
+    static side(idx: PieceTypeValues): Side {
         if (idx >= 0 && idx < 6) {
-            return !!Side.white;
+            return Side.white;
         } else {
-            return !!Side.black;
+            return Side.black;
         }
     }
 }
@@ -170,6 +170,26 @@ export const unicodePiecesFlipped = {
     [PieceType.wKing]: "♚"
 };
 
+export type PiecesFenChar =
+    | "K"
+    | "Q"
+    | "R"
+    | "B"
+    | "N"
+    | "P"
+    | "k"
+    | "q"
+    | "r"
+    | "b"
+    | "n"
+    | "p"
+    | "/"
+    | "1"
+    | "2"
+    | "3"
+    | "4"
+    | "5"
+    | "8";
 
 // inverted asciiPieces
 export const pieceFromString = {
@@ -252,9 +272,9 @@ export const bishopRelevantBits = [
     5n,
     5n,
     6n
-  ];
-  
-  export const rookRelevantBits = [
+];
+
+export const rookRelevantBits = [
     12n,
     11n,
     11n,
@@ -319,6 +339,6 @@ export const bishopRelevantBits = [
     11n,
     11n,
     12n
-  ];
+];
 
-  
+

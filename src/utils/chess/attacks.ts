@@ -3,18 +3,18 @@ import { bishopRelevantBits, rookRelevantBits, Side } from "./constants";
 import { bishopMagicNumbers, rookMagicNumbers } from "./magic_numbers";
 import { bigIntFloorDivision, countBits, setOccupancy } from "./utils"
 
-export const pawnAttacks = [
+export const pawnAttacks: [bigint[], bigint[]] = [
     Array(64).fill(0n), // White pawns
     Array(64).fill(0n) // Black pawns
 ];
 
-export const kingAttacks = Array(64).fill(0n);
-export const knightAttacks = Array(64).fill(0n);
-export const bishopMasks = Array(64).fill(0n);
-export const rookMasks = Array(64).fill(0n);
+export const kingAttacks: bigint[] = Array(64).fill(0n);
+export const knightAttacks: bigint[] = Array(64).fill(0n);
+export const bishopMasks: bigint[] = Array(64).fill(0n);
+export const rookMasks: bigint[] = Array(64).fill(0n);
 
-export const bishopAttacks: Array<Map<bigint, bigint>> = Array(64).fill(new Map());
-export const rookAttacks: Array<Map<bigint, bigint>> = Array(64).fill(new Map());
+export const bishopAttacks: Array<Map<bigint, bigint>> = Array.from({ length: 64 }, () => new Map());
+export const rookAttacks: Array<Map<bigint, bigint>> = Array.from({ length: 64 }, () => new Map());
 
 function maskPawnAttacks(square: bigint, side: Side): bigint {
     const bitboard = new BitBoard(0n).setBit(square);
@@ -254,6 +254,7 @@ export function getRookAttacks(square: bigint, occupancy: BitBoard): BitBoard {
     const squareNum = Number(square);
     // get rook attacks assuming current board occupancy
     let occ = occupancy.value;
+    // console.log(squareNum);
     occ &= rookMasks[squareNum];
     occ *= rookMagicNumbers[squareNum];
     occ >>= 64n - rookRelevantBits[squareNum];
