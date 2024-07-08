@@ -7,6 +7,8 @@ export class BitBoard {
 
     constructor(value: bigint) {
         this.value = (
+            value === (-1n << 65n) ||
+            value === (1n << 65n) ||
             value === (-1n << 64n) ||
             value === (1n << 64n)
             // value === (1n << 63n) ||

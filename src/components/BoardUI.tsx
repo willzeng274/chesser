@@ -253,7 +253,9 @@ console.log("Init attacks took: ", Date.now() - ds);
 export default function BoardUI() {
 	const ref = useRef<HTMLElement>(null);
 
-	const boardRef = useRef<Board>(Board.startingPosition());
+	// const boardRef = useRef<Board>(Board.startingPosition());
+	const boardRef = useRef<Board>(Board.fromFen("1KR5/1PPBN3/3P4/4P3/4p3/1pn1qp2/pb1pn2Q/1k6 w - - 0 1"));
+
 	const selectedRef = useRef<SquareValue | null>(null);
 	const timeoutRef = useRef<number | null>(null);
 
@@ -261,7 +263,7 @@ export default function BoardUI() {
 	// const [isWhite, setIsWhite] = useState<boolean>(true);
 	const [turn, setTurn] = useState<Side>(Side.white);
 
-	const isWhite = false;
+	const isWhite = true;
 
 	const update = useCallback((turn: Side, flags: number) => {
 		// setIsWhite(w => !w);

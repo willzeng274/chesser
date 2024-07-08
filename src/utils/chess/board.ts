@@ -345,7 +345,7 @@ export class Board {
     }
 
     // No Need for now
-    fromFen(fen: string) {
+    static fromFen(fen: string) {
         const board = Board.empty();
         let square = 0;
 
@@ -359,7 +359,7 @@ export class Board {
         const fullMoveNumber = parseInt(_fen[5] ?? '0');
 
         for (const char of pieceFen.split('') as PiecesFenChar[]) {
-            if (parseInt(char) !== null) {
+            if (!isNaN(parseInt(char))) {
                 square += parseInt(char);
                 continue;
             } else if (char === "/") {
@@ -387,6 +387,8 @@ export class Board {
         board.halfMoveClock = BigInt(halfMoveClock ?? 0);
 
         board.movesPlayed = BigInt(fullMoveNumber ?? 1);
+
+        board.legalMoves = board.generateLegalMoves();
 
         return board;
     }
@@ -1022,6 +1024,7 @@ export class Board {
                 while (bitboard.notEmpty) {
                     // init source square
                     sourceSquare = getLs1bIndex(bitboard.value);
+                    console.log("KING", piece, sourceSquare, bitboard);
 
                     // init piece attacks in order to get set of target squares
                     let attacks = new BitBoard(kingAttacks[Number(sourceSquare)] & ~this.piecesOf(PieceType.side(piece)).value);
@@ -1030,6 +1033,9 @@ export class Board {
                     while (attacks.notEmpty) {
                         // init target square
                         targetSquare = getLs1bIndex(attacks.value);
+
+                        console.log("new target square", targetSquare);
+                        attacks.printBoard(true);
 
                         // quite move
                         // if (!get_bit(((side === white) ? occupancies[black] : occupancies[white]), targetSquare))
