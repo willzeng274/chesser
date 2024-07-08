@@ -40,11 +40,11 @@ export class BitBoard {
 
     popBit(square: bigint): BitBoard {
         assert(square >= 0n && square < 64n);
-        if (square === 56n) {
-            console.log("popping bit", ~(1n << (square)));
-            console.log("this.value", this.value);
-            console.log("AND", this.value & ~(1n << (square)));
-        }
+        // if (square === 56n) {
+        //     console.log("popping bit", ~(1n << (square)));
+        //     console.log("this.value", this.value);
+        //     console.log("AND", this.value & ~(1n << (square)));
+        // }
         return new BitBoard(this.value & ~(1n << (square)));
     }
 

@@ -63,7 +63,7 @@ export const Squares = {
     f1: 61,
     g1: 62,
     h1: 63,
-}
+} as const;
 
 export enum Side {
     white,
@@ -138,7 +138,7 @@ export const asciiPieces = {
     [PieceType.bBishop]: "b",
     [PieceType.bKnight]: "n",
     [PieceType.bPawn]: "p",
-};
+} as const;
 
 export const unicodePieces = {
     [PieceType.bPawn]: "♟︎",
@@ -153,7 +153,7 @@ export const unicodePieces = {
     [PieceType.wRook]: "♖",
     [PieceType.wQueen]: "♕",
     [PieceType.wKing]: "♔"
-};
+} as const;
 
 export const unicodePiecesFlipped = {
     [PieceType.bPawn]: "♙",
@@ -168,7 +168,22 @@ export const unicodePiecesFlipped = {
     [PieceType.wRook]: "♜",
     [PieceType.wQueen]: "♛",
     [PieceType.wKing]: "♚"
-};
+} as const;
+
+export const classPieces = {
+    [PieceType.bPawn]: "black pawn",
+    [PieceType.bKnight]: "black knight",
+    [PieceType.bBishop]: "black bishop",
+    [PieceType.bRook]: "black rook",
+    [PieceType.bQueen]: "black queen",
+    [PieceType.bKing]: "black king",
+    [PieceType.wPawn]: "white pawn",
+    [PieceType.wKnight]: "white knight",
+    [PieceType.wBishop]: "white bishop",
+    [PieceType.wRook]: "white rook",
+    [PieceType.wQueen]: "white queen",
+    [PieceType.wKing]: "white king"
+  } as const;
 
 export type PiecesFenChar =
     | "K"
@@ -205,7 +220,7 @@ export const pieceFromString = {
     "b": PieceType.bBishop,
     "n": PieceType.bKnight,
     "p": PieceType.bPawn,
-};
+} as const;
 
 export const bishopRelevantBits = [
     6n,
@@ -272,7 +287,7 @@ export const bishopRelevantBits = [
     5n,
     5n,
     6n
-];
+] as const;
 
 export const rookRelevantBits = [
     12n,
@@ -339,6 +354,6 @@ export const rookRelevantBits = [
     11n,
     11n,
     12n
-];
+] as const;
 
 

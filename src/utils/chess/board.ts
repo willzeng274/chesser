@@ -53,6 +53,8 @@ export class Board {
     enPassant?: bigint;
     halfMoveClock: bigint;
     movesPlayed: bigint = 1n;
+    
+    legalMoves: Move[];
 
     pieceBitBoards: Map<PieceTypeValues, BitBoard> = new Map();
 
@@ -92,6 +94,8 @@ export class Board {
         this.pieceBitBoards.set(PieceType.bBishop, blackBishops);
         this.pieceBitBoards.set(PieceType.bKnight, blackKnights);
         this.pieceBitBoards.set(PieceType.bPawn, blackPawns);
+
+        this.legalMoves = this.generateLegalMoves();
     }
 
     static startingPosition(): Board {
@@ -170,7 +174,6 @@ export class Board {
     }
 
     get allPieces(): BitBoard { return this.whitePieces.union(this.blackPieces) }
-
 
     get isCheck() {
         return this.isSquareAttacked(
@@ -401,7 +404,6 @@ export class Board {
             let targetSquare: bigint;
 
             let bitboard = new BitBoard(this.pieceBitBoards.get(piece)!.value); // Create a new bitboard from the value
-            // console.log("Old bitboard", bitboard);
             if (PieceType.side(piece) === Side.white) {
                 // gen white pawn moves and white castling moves here
                 if (piece === PieceType.wPawn) {
@@ -923,22 +925,9 @@ export class Board {
                 }
             } else if (piece === PieceType.wRook || piece === PieceType.bRook) {
                 // loop over source squares of piece bitboard copy
-                // console.log("new bitboard", bitboard);
-                console.log("ROOK TIME");
-                bitboard.printBoard();
-                // if (!bitboard.notEmpty) {
-                //     console.log("empty bitboard");
-                // }
                 while (bitboard.notEmpty) {
-                    console.log("loop bitboard", bitboard);
                     // init source square
                     sourceSquare = getLs1bIndex(bitboard.value);
-                    console.log("new rook source square", sourceSquare);
-
-                    if (sourceSquare === BigInt(Squares.h1)) {
-                        console.log("Source square", sourceSquare, bitboard);
-                        bitboard.printBoard();
-                    }
 
                     // init piece attacks in order to get set of target squares
                     let attacks = getRookAttacks(sourceSquare, this.allPieces).intersect(this.piecesOf(PieceType.side(piece)).complement());
@@ -981,8 +970,6 @@ export class Board {
 
                     // pop ls1b of the current piece bitboard copy
                     bitboard = bitboard.popBit(sourceSquare);
-                    console.log("after pop bit", bitboard);
-                    bitboard.printBoard();
                 }
             } else if (piece === PieceType.wQueen || piece === PieceType.bQueen) {
                 // loop over source squares of piece bitboard copy
@@ -1331,4 +1318,3 @@ function handlePawnPromotion(board: Board, move: Move) {
             board.pieceBitBoards.get(move.promotedPiece!)!.setBit(move.to));
     }
 }
-// console.log(Board.startingPosition().toFen());
