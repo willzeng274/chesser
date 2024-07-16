@@ -25,7 +25,7 @@ console.log("Size", size);
 function onStart(
 	boardRef: React.MutableRefObject<ChessBoard>,
 	selectedRef: React.MutableRefObject<SquareValue | null>,
-	timeoutRef: React.MutableRefObject<number | null>,
+	timeoutRef: React.MutableRefObject<NodeJS.Timeout | null>,
 	isWhite: boolean,
 	game: GameType,
 	update: (turn: Side, move: Move) => void
@@ -236,7 +236,7 @@ export default function Board({ attacks }: BoardUIProps) {
 	// const boardRef = useRef<ChessBoard>(ChessBoard.fromFen("1KR5/1PPBN3/3P4/4P3/4p3/1pn1qp2/pb1pn2Q/1k6 w - - 0 1"));
 
 	const selectedRef = useRef<SquareValue | null>(null);
-	const timeoutRef = useRef<number | null>(null);
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const squaresRef = useRef<(HTMLDivElement | null)[]>(Array(64));
 
