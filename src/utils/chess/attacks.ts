@@ -3,20 +3,20 @@ import { bishopRelevantBits, rookRelevantBits, Side } from "./constants";
 import { bishopMagicNumbers, rookMagicNumbers } from "./magic_numbers";
 import { bigIntFloorDivision, countBits, setOccupancy } from "./utils"
 
-export const pawnAttacks: [bigint[], bigint[]] = [
+export let pawnAttacks: [bigint[], bigint[]] = [
     Array(64).fill(0n), // White pawns
     Array(64).fill(0n) // Black pawns
 ];
 
-export const kingAttacks: bigint[] = Array(64).fill(0n);
-export const knightAttacks: bigint[] = Array(64).fill(0n);
-export const bishopMasks: bigint[] = Array(64).fill(0n);
-export const rookMasks: bigint[] = Array(64).fill(0n);
+export let kingAttacks: bigint[] = Array(64).fill(0n);
+export let knightAttacks: bigint[] = Array(64).fill(0n);
+export let bishopMasks: bigint[] = Array(64).fill(0n);
+export let rookMasks: bigint[] = Array(64).fill(0n);
 
-export const bishopAttacks: Array<Map<bigint, bigint>> = Array.from({ length: 64 }, () => new Map());
-export const rookAttacks: Array<Map<bigint, bigint>> = Array.from({ length: 64 }, () => new Map());
+export let bishopAttacks: Array<Map<bigint, bigint>> = Array.from({ length: 64 }, () => new Map());
+export let rookAttacks: Array<Map<bigint, bigint>> = Array.from({ length: 64 }, () => new Map());
 
-function maskPawnAttacks(square: bigint, side: Side): bigint {
+async function maskPawnAttacks(square: bigint, side: Side): Promise<bigint> {
     const bitboard = new BitBoard(0n).setBit(square);
     let attacks = new BitBoard(0n);
 
@@ -31,7 +31,7 @@ function maskPawnAttacks(square: bigint, side: Side): bigint {
     return attacks.value;
 }
 
-function maskKnightAttacks(square: bigint): bigint {
+async function maskKnightAttacks(square: bigint): Promise<bigint> {
     const bitboard = new BitBoard(0n).setBit(square);
     let attacks = new BitBoard(0n);
 
@@ -47,7 +47,7 @@ function maskKnightAttacks(square: bigint): bigint {
     return attacks.value;
 }
 
-function maskKingAttacks(square: bigint): bigint {
+async function maskKingAttacks(square: bigint): Promise<bigint> {
     const bitboard = new BitBoard(0n).setBit(square);
     let attacks = new BitBoard(0n);
 
@@ -61,17 +61,6 @@ function maskKingAttacks(square: bigint): bigint {
     if (bitboard.shl(1n).intersect(NOT_A_FILE).notEmpty) attacks = attacks.union(bitboard.shl(1n));
 
     return attacks.value;
-
-    //   if ((bitboard >> 8).notEmpty) attacks |= (bitboard >> 8);
-    //   if (((bitboard >> 9) & NOT_H_FILE).notEmpty) attacks |= (bitboard >> 9);
-    //   if (((bitboard >> 7) & NOT_A_FILE).notEmpty) attacks |= (bitboard >> 7);
-    //   if (((bitboard >> 1) & NOT_H_FILE).notEmpty) attacks |= (bitboard >> 1);
-    //   if ((bitboard << 8).notEmpty) attacks |= (bitboard << 8);
-    //   if (((bitboard << 9) & NOT_A_FILE).notEmpty) attacks |= (bitboard << 9);
-    //   if (((bitboard << 7) & NOT_H_FILE).notEmpty) attacks |= (bitboard << 7);
-    //   if (((bitboard << 1) & NOT_A_FILE).notEmpty) attacks |= (bitboard << 1);
-
-    //   return attacks.value;
 }
 
 function bigIntModulus(a: bigint, b: bigint): bigint {
@@ -84,7 +73,7 @@ function bigIntModulus(a: bigint, b: bigint): bigint {
     return result;
 }
 
-function maskBishopAttacks(square: bigint): bigint {
+async function maskBishopAttacks(square: bigint): Promise<bigint> {
     let attacks = 0n;
 
     const tr = bigIntFloorDivision(square, 8n);
@@ -109,7 +98,7 @@ function maskBishopAttacks(square: bigint): bigint {
     return attacks;
 }
 
-function maskRookAttacks(square: bigint): bigint {
+async function maskRookAttacks(square: bigint): Promise<bigint> {
     let attacks = new BitBoard(0n);
 
     const tr = bigIntFloorDivision(square, 8n);
@@ -131,7 +120,7 @@ function maskRookAttacks(square: bigint): bigint {
     return attacks.value;
 }
 
-function genBishopAttacksOnTheFly(square: bigint, blockers: bigint): bigint {
+async function genBishopAttacksOnTheFly(square: bigint, blockers: bigint): Promise<bigint> {
     // result attacks bitboard
     let attacks = new BitBoard(0n);
 
@@ -164,7 +153,7 @@ function genBishopAttacksOnTheFly(square: bigint, blockers: bigint): bigint {
     return attacks.value;
 }
 
-function genRookAttacksOnTheFly(square: bigint, blockers: bigint): bigint {
+async function genRookAttacksOnTheFly(square: bigint, blockers: bigint): Promise<bigint> {
     let attacks = new BitBoard(0n);
 
     // init target rank & files
@@ -196,14 +185,13 @@ function genRookAttacksOnTheFly(square: bigint, blockers: bigint): bigint {
     return attacks.value;
 }
 
-function initSliderAttacks(isBishop: boolean) {
-
+async function initSliderAttacks(isBishop: boolean) {
 
     // loop over 64 board squares
     for (let square = 0n; square < 64n; square++) {
         const squareNum = Number(square)
-        bishopMasks[squareNum] = maskBishopAttacks(square);
-        rookMasks[squareNum] = maskRookAttacks(square);
+        bishopMasks[squareNum] = await maskBishopAttacks(square);
+        rookMasks[squareNum] = await maskRookAttacks(square);
 
         // Get current attack mask
         const attackMask = new BitBoard(isBishop ? bishopMasks[squareNum] : rookMasks[squareNum]);
@@ -222,7 +210,7 @@ function initSliderAttacks(isBishop: boolean) {
                     (64n - bishopRelevantBits[squareNum]);
 
                 // Set the bishop attacks
-                bishopAttacks[squareNum].set(magicIndex, genBishopAttacksOnTheFly(square, occupancy));
+                bishopAttacks[squareNum].set(magicIndex, await genBishopAttacksOnTheFly(square, occupancy));
             } else {
                 // Rook
                 // Get the current occupancy variation
@@ -233,9 +221,11 @@ function initSliderAttacks(isBishop: boolean) {
                     (64n - rookRelevantBits[squareNum]);
 
                 // Set the rook attacks
-                rookAttacks[squareNum].set(magicIndex, genRookAttacksOnTheFly(square, occupancy));
+                rookAttacks[squareNum].set(magicIndex, await genRookAttacksOnTheFly(square, occupancy));
             }
         }
+
+        if (square % 31n === 0n) await new Promise(resolve => requestAnimationFrame(resolve));
     }
 }
 
@@ -266,18 +256,51 @@ export function getQueenAttacks(square: bigint, occupancy: BitBoard): BitBoard {
     return getBishopAttacks(square, occupancy).union(getRookAttacks(square, occupancy));
 }
 
-export function initAttacks() {
+export interface Attacks {
+    pawnAttacks: [bigint[], bigint[]];
+    kingAttacks: bigint[];
+    knightAttacks: bigint[];
+    bishopMasks: bigint[];
+    rookMasks: bigint[];
+    bishopAttacks: Array<Map<bigint, bigint>>;
+    rookAttacks: Array<Map<bigint, bigint>>;
+}
+
+export async function initAttacks(): Promise<Attacks> {
     for (let square = 0n; square < 64n; square++) {
         const squareNum = Number(square);
         // We also need to mask attacks for the 1th and 8th ranks
-        pawnAttacks[0][squareNum] = maskPawnAttacks(square, Side.white);
-        pawnAttacks[1][squareNum] = maskPawnAttacks(square, Side.black);
+        pawnAttacks[0][squareNum] = await maskPawnAttacks(square, Side.white);
+        pawnAttacks[1][squareNum] = await maskPawnAttacks(square, Side.black);
 
-        knightAttacks[squareNum] = maskKnightAttacks(square);
+        knightAttacks[squareNum] = await maskKnightAttacks(square);
 
-        kingAttacks[squareNum] = maskKingAttacks(square);
+        kingAttacks[squareNum] = await maskKingAttacks(square);
+
+        if (square % 31n === 0n) await new Promise(resolve => requestAnimationFrame(resolve));
     }
 
-    initSliderAttacks(true);
-    initSliderAttacks(false);
+    await initSliderAttacks(true);
+
+    await initSliderAttacks(false);
+
+    return {
+        pawnAttacks,
+        kingAttacks,
+        knightAttacks,
+        bishopMasks,
+        rookMasks,
+        bishopAttacks,
+        rookAttacks,
+    };
+}
+
+export function initAttacksFromObject(obj: Attacks) {
+    pawnAttacks = obj.pawnAttacks;
+    kingAttacks = obj.kingAttacks;
+    knightAttacks = obj.knightAttacks;
+    bishopMasks = obj.bishopMasks;
+    rookMasks = obj.rookMasks;
+    bishopAttacks = obj.bishopAttacks;
+    rookAttacks = obj.rookAttacks;
 }

@@ -6,7 +6,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api": "http://localhost:5000/"
+      '/api': {
+        // this should not proxy since vercel only has 10s timeout
+        target: import.meta.env.PROD ? 'https://chesser-backend.williamzeng.xyz' : 'http://localhost:8080/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        ws: true
+      },
     },
   }
 });

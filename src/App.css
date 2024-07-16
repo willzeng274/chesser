@@ -1,19 +1,96 @@
-/* html, body {
+html {
   width: 100%;
-  height: 100%;
-}
-
-#root {
-  width: 100%;
-  height: 100%;
-} */
-
-#root {
+  min-height: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
+
+body {
+  width: 100%;
+  flex: 1;
+}
+
+
+#root {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}
+
+@keyframes progressAnimation {
+  0% {
+      transform: translateX(-100%);
+  }
+  100% {
+      transform: translateX(-5%);
+  }
+}
+
+.progress-bar-animation {
+  animation: progressAnimation 3s ease-out forwards;
+}
+
+@keyframes spinCircle {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translate(15px) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) translate(15px) rotate(-360deg);
+  }
+}
+
+.animation-spin-circle {
+  animation: spinCircle 2s linear infinite;
+}
+
+.dots::after {
+  content: '';
+  animation: dots 2s steps(3, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
+  }
+}
+
+body::after {
+  /* hide images */
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index:-1;
+  /* load images in the background */
+  content: url("/piece_sets/chess7/wB.png")
+  url("/piece_sets/chess7/wN.png")
+  url("/piece_sets/chess7/wR.png")
+  url("/piece_sets/chess7/wQ.png") /* instead of using `content` we should probably preload this */
+  url("/piece_sets/chess7/wK.png") /* <link rel="preload" as="image" href="./img.png">  in the main.html*/
+  url("/piece_sets/chess7/bP.png")
+  url("/piece_sets/chess7/bB.png")
+  url("/piece_sets/chess7/bN.png")
+  url("/piece_sets/chess7/bR.png")
+  url("/piece_sets/chess7/bQ.png")
+  url("/piece_sets/chess7/bK.png")
+  url("/board/horsey.jpg")
+  url("/wood_texture.jpg")
+  url("/board/horsey.move-dest.png")
+  url("/board/horsey.last-move.png")
+  url("/board/horsey.selected.png");
+}
+
 
 /* #root {
   max-width: 1280px;

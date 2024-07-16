@@ -95,7 +95,7 @@ export class Board {
         this.pieceBitBoards.set(PieceType.bKnight, blackKnights);
         this.pieceBitBoards.set(PieceType.bPawn, blackPawns);
 
-        this.legalMoves = this.generateLegalMoves();
+        this.legalMoves = [];
     }
 
     static startingPosition(): Board {
@@ -1024,7 +1024,7 @@ export class Board {
                 while (bitboard.notEmpty) {
                     // init source square
                     sourceSquare = getLs1bIndex(bitboard.value);
-                    console.log("KING", piece, sourceSquare, bitboard);
+                    // console.log("KING", piece, sourceSquare, bitboard);
 
                     // init piece attacks in order to get set of target squares
                     let attacks = new BitBoard(kingAttacks[Number(sourceSquare)] & ~this.piecesOf(PieceType.side(piece)).value);
@@ -1034,8 +1034,8 @@ export class Board {
                         // init target square
                         targetSquare = getLs1bIndex(attacks.value);
 
-                        console.log("new target square", targetSquare);
-                        attacks.printBoard(true);
+                        // console.log("new target square", targetSquare);
+                        // attacks.printBoard(true);
 
                         // quite move
                         // if (!get_bit(((side === white) ? occupancies[black] : occupancies[white]), targetSquare))
@@ -1104,6 +1104,8 @@ export class Board {
 
     generateLegalMoves(pseudoLegalMoves?: Move[]) {
         // Optionally let the user specify a pseudoLegalMoves cache to generate legal moves from
+        // console.log("generated");
+
         const moves: Move[] = [];
 
         const copyOfBoard = this.toCopy();

@@ -1,35 +1,49 @@
 // import { useState } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
+import { useState } from "react";
 import "./App.css";
-import BoardUI from "./components/BoardUI.tsx";
+import BoardUI from "./components/board/Board.tsx";
+import Selection from "./components/Selection.tsx";
+import { Attacks, initAttacks } from "./utils/chess/attacks.ts";
+import { GameType, useGameStore } from "./utils/stores.ts";
+import useEffectOnce from "./utils/useEffectOnce.ts";
+import Loading from "./components/Loading.tsx";
 
 function App() {
-	// const [count, setCount] = useState(0)
+	const game = useGameStore((state) => state.gameType);
+	const [attacks, setAttacks] = useState<Attacks | null>(null);
+
+	useEffectOnce(() => {
+		const ds = Date.now();
+
+		initAttacks().then((attacks) => {
+			setAttacks(attacks);
+			console.log("Init attacks took: ", Date.now() - ds);
+		});
+	}, []);
+
+	useEffectOnce(() => {
+		if (game !== GameType.undefined) {
+			const audio = new Audio("/sound/game-start.mp3");
+			audio.play();
+		}
+	}, [game]);
+
+	// useEffectOnce(() => {
+	// 	console.log("ATTACKS", attacks);
+	// }, [attacks]);
 
 	return (
 		<>
-			<BoardUI />
-			{/* <div className="flex">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p> */}
+			{attacks === null ? (
+				<Loading />
+			) : (
+				<>
+					{game === GameType.undefined && <Selection />}
+					{game !== GameType.undefined && <BoardUI attacks={attacks} />}
+				</>
+			)}
 		</>
 	);
 }

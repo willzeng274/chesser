@@ -6,14 +6,17 @@ export class BitBoard {
     value: bigint;
 
     constructor(value: bigint) {
-        this.value = (
-            value === (-1n << 65n) ||
-            value === (1n << 65n) ||
-            value === (-1n << 64n) ||
-            value === (1n << 64n)
-            // value === (1n << 63n) ||
-            // value === (-1n << 63n)
-        ) ? 0n : value;
+        const mask = (1n << 64n) - 1n;
+        this.value = value & mask;
+        // return value & mask;
+        // this.value = (
+        //     value === (-1n << 65n) ||
+        //     value === (1n << 65n) ||
+        //     value === (-1n << 64n) ||
+        //     value === (1n << 64n)
+        //     // value === (1n << 63n) ||
+        //     // value === (-1n << 63n)
+        // ) ? 0n : value;
     }
 
     static readonly full = new BitBoard(0xffffffffffffffffn);

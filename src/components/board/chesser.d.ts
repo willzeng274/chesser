@@ -8,5 +8,7 @@ declare namespace JSX {
         'cr-board': DivClone;
         'cr-square': DivClone;
         'cr-piece': DivClone;
+        'cr-coords': DivClone;
+        'cr-coord': DivClone;
     }
 }

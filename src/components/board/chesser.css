@@ -6,8 +6,7 @@
 
 .cr-cr {
 	display: inline-block;
-	border: 24px solid transparent;
-	border-image: url("/wood_texture.jpg") 64;
+	/* border: 24px solid transparent; */
 }
 
 cr-container {
@@ -16,6 +15,7 @@ cr-container {
 	height: 100%;
 	display: block;
 	top: 0;
+	z-index: 1;
 }
 
 cr-board {
@@ -30,6 +30,7 @@ cr-board {
 	user-select: none;
 	line-height: 0;
 	background-size: cover;
+	z-index: 1;
 }
 
 .cr-wrap.manipulable cr-board {
@@ -132,16 +133,16 @@ cr-piece.fading {
 	overflow: visible;
 } */
 
-.cr-wrap coords {
+/* .cr-wrap cr-coords {
 	position: absolute;
 	display: flex;
 	pointer-events: none;
 	opacity: 0.8;
 	font-family: sans-serif;
 	font-size: 9px;
-}
+} */
 
-.cr-wrap coords.ranks {
+/* .cr-wrap cr-coords.ranks {
 	left: 4px;
 	top: -20px;
 	flex-flow: column-reverse;
@@ -149,16 +150,16 @@ cr-piece.fading {
 	width: 12px;
 }
 
-.cr-wrap coords.ranks.black {
+.cr-wrap cr-coords.ranks.black {
 	flex-flow: column;
 }
 
-.cr-wrap coords.ranks.left {
+.cr-wrap cr-coords.ranks.left {
 	left: -15px;
 	align-items: flex-end;
 }
 
-.cr-wrap coords.files {
+.cr-wrap cr-coords.files {
 	bottom: -4px;
 	left: 24px;
 	flex-flow: row;
@@ -168,19 +169,23 @@ cr-piece.fading {
 	text-align: center;
 }
 
-.cr-wrap coords.files.black {
+.cr-wrap cr-coords.files.black {
 	flex-flow: row-reverse;
 }
 
-.cr-wrap coords coord {
+.cr-wrap cr-coords cr-coord {
 	flex: 1 1 auto;
-}
+} */
 
-.cr-wrap coords.ranks coord {
+/* .cr-wrap cr-coords.files cr-coord {
+	transform: translateX(12%) translateY(-3%);
+} */
+
+/* .cr-wrap cr-coords.ranks cr-coord {
 	transform: translateY(39%);
 }
 
-.cr-wrap coords.squares {
+.cr-wrap cr-coords.squares {
 	bottom: 0;
 	left: 0;
 	text-transform: uppercase;
@@ -190,45 +195,45 @@ cr-piece.fading {
 	width: 12.5%;
 }
 
-.cr-wrap coords.squares.black {
+.cr-wrap cr-coords.squares.black {
 	flex-flow: column;
 }
 
-.cr-wrap coords.squares.left {
+.cr-wrap cr-coords.squares.left {
 	text-align: left;
 }
 
-.cr-wrap coords.squares coord {
+.cr-wrap cr-coords.squares cr-coord {
 	padding: 6% 4%;
 }
 
-.cr-wrap coords.squares.rank2 {
+.cr-wrap cr-coords.squares.rank2 {
 	transform: translateX(100%);
 }
 
-.cr-wrap coords.squares.rank3 {
+.cr-wrap cr-coords.squares.rank3 {
 	transform: translateX(200%);
 }
 
-.cr-wrap coords.squares.rank4 {
+.cr-wrap cr-coords.squares.rank4 {
 	transform: translateX(300%);
 }
 
-.cr-wrap coords.squares.rank5 {
+.cr-wrap cr-coords.squares.rank5 {
 	transform: translateX(400%);
 }
 
-.cr-wrap coords.squares.rank6 {
+.cr-wrap cr-coords.squares.rank6 {
 	transform: translateX(500%);
 }
 
-.cr-wrap coords.squares.rank7 {
+.cr-wrap cr-coords.squares.rank7 {
 	transform: translateX(600%);
 }
 
-.cr-wrap coords.squares.rank8 {
+.cr-wrap cr-coords.squares.rank8 {
 	transform: translateX(700%);
-}
+} */
 
 .cr-wrap cr-piece.pawn.white {
 	background-image: url("/piece_sets/chess7/wP.png");
@@ -314,17 +319,48 @@ cr-board cr-square.current-premove {
 	background-color: rgba(20, 30, 85, 0.5);
 }
 
+.cr-wrap cr-coords {
+	display: block;
+	width: 100%;
+	height: 100%;
+	user-select: none;
+}
+
+.cr-wrap cr-coords.files {
+	height: 2rem;
+}
+
+.cr-wrap cr-coords cr-coord {
+	position: absolute;
+	color: white;
+	font-family: sans-serif;
+	z-index: 0;
+}
+
+.cr-wrap cr-coords.ranks cr-coord {
+	/* left: -15px; */
+	display: flex;
+	/* justify-content: center; */
+	align-items: center;
+}
+
+.cr-wrap cr-coords.files cr-coord {
+	top: 100%;
+	text-align: center;
+    /* transform: translateY(5px); */
+}
+
 /** Alternating colors in rank/file/square labels */
-.cr-wrap coords:nth-child(odd) coord:nth-child(even),
-.cr-wrap coords.squares:nth-child(even) coord:nth-child(odd),
-.cr-wrap.orientation-black coords.files:nth-child(even) coord:nth-child(odd),
-.cr-wrap coords.files:nth-child(even) coord:nth-child(even) {
+/* .cr-wrap cr-coords:nth-child(odd) cr-coord:nth-child(even),
+.cr-wrap cr-coords.squares:nth-child(even) cr-coord:nth-child(odd),
+.cr-wrap.orientation-black cr-coords.files:nth-child(even) cr-coord:nth-child(odd),
+.cr-wrap cr-coords.files:nth-child(even) cr-coord:nth-child(even) {
 	color: rgba(72, 72, 72, 0.8);
 }
 
-.cr-wrap coords:nth-child(odd) coord:nth-child(odd),
-.cr-wrap coords.squares:nth-child(even) coord:nth-child(even),
-.cr-wrap.orientation-black coords.files:nth-child(even) coord:nth-child(even),
-.cr-wrap coords.files:nth-child(even) coord:nth-child(odd) {
+.cr-wrap cr-coords:nth-child(odd) cr-coord:nth-child(odd),
+.cr-wrap cr-coords.squares:nth-child(even) cr-coord:nth-child(even),
+.cr-wrap.orientation-black cr-coords.files:nth-child(even) cr-coord:nth-child(even),
+.cr-wrap cr-coords.files:nth-child(even) cr-coord:nth-child(odd) {
 	color: rgba(255, 255, 255, 0.8);
-}
+} */
