@@ -133,6 +133,9 @@ function onStart(
 				(e.target! as HTMLElement).insertBefore(elem, (e.target as HTMLElement).firstChild);
 			}
 
+			// this is for multiple event listeners
+			const abortController = new AbortController();
+
 			pieceMoves.forEach((m) => {
 				const elem = document.createElement("cr-square");
 				elem.className = "move-dest";
@@ -206,6 +209,35 @@ function onStart(
 
 				elem.addEventListener("mouseup", drop);
 				elem.addEventListener("touchend", drop);
+
+				const board = document.querySelector("cr-board") as HTMLElement;
+
+				if (e.touches && board) {
+					// console.log("touch moving rn");
+					const dropBoard = (e: TouchEvent) => {
+						if (!e.isTrusted) return;
+						if (e.touches && e.touches.length > 1) return;
+						e.preventDefault();
+
+						const boardPos = board.getBoundingClientRect();
+						const x = e.changedTouches![0].clientX - boardPos.left;
+						const y = e.changedTouches![0].clientY - boardPos.top;
+
+						const file = Math.ceil(x / (size / 8));
+						const rank = 9 - Math.ceil(y / (size / 8));
+
+						const square = isWhite ? (8 - rank) * 8 + file - 1 : 63 - ((8 - rank) * 8 + file - 1);
+
+						// const selectedPiece = boardRef.current.getPieceInSquare(BigInt(square));
+
+						if (square === to) {
+							drop();
+							// board.removeEventListener("touchend", dropBoard);
+							abortController.abort();
+						}
+					};
+					board.addEventListener("touchend", dropBoard, { signal: abortController.signal });
+				}
 
 				(e.target! as HTMLElement).insertBefore(elem, (e.target as HTMLElement).firstChild);
 			});
@@ -539,7 +571,7 @@ export default function Board({ attacks }: BoardUIProps) {
 					<p className="w-full text-center p-2 text-white bg-slate-800/80 rounded-t-md">Moves</p>
 					{moves.map((mv, ind) => (
 						<div className="flex flex-row text-white" key={ind}>
-							<div className="w-8 bg-slate-500/90">{ind+1}</div>
+							<div className="w-8 bg-slate-500/90">{ind + 1}</div>
 							<div className="flex-grow flex flex-row">
 								<div className="px-1 w-1/2 text-start hover:bg-blue-400">{mv[0]}</div>
 								{mv[1] && <div className="px-1 w-1/2 text-start hover:bg-blue-400">{mv[1]}</div>}
