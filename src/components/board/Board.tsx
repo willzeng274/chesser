@@ -30,11 +30,17 @@ function onStart(
 	game: GameType,
 	update: (turn: Side, move: Move) => void
 ) {
+	// this is for multiple event listeners
+	let abortController = new AbortController();
 	return function (e: MouchEvent) {
 		if (!e.isTrusted) return;
 		if (e.buttons !== undefined && e.buttons > 1) return;
 		if (e.touches && e.touches.length > 1) return;
-		e.preventDefault();
+		if (e.cancelable) e.preventDefault();
+
+		abortController.abort();
+
+		abortController = new AbortController();
 
 		const boardPos = (e.target as HTMLElement).getBoundingClientRect();
 		const x = (e.clientX ?? e.touches![0].clientX) - boardPos.left;
@@ -44,6 +50,8 @@ function onStart(
 		const rank = 9 - Math.ceil(y / (size / 8));
 
 		const square = isWhite ? (8 - rank) * 8 + file - 1 : 63 - ((8 - rank) * 8 + file - 1);
+
+		if (square >= 64n || square < 0n) return;
 
 		const selectedPiece = boardRef.current.getPieceInSquare(BigInt(square));
 
@@ -80,7 +88,7 @@ function onStart(
 			};
 
 			document.addEventListener("mousemove", onMove);
-			document.addEventListener("touchmove", onMove);
+			document.addEventListener("touchmove", onMove, { passive: false });
 
 			const onUp = (ev: MouchEvent) => {
 				document.removeEventListener("mousemove", onMove);
@@ -121,7 +129,7 @@ function onStart(
 			};
 
 			document.addEventListener("mouseup", onUp);
-			document.addEventListener("touchend", onUp);
+			document.addEventListener("touchend", onUp, { passive: false });
 
 			const pieceMoves = boardRef.current.legalMoves.filter((m) => m.from === BigInt(square));
 
@@ -133,9 +141,6 @@ function onStart(
 				(e.target! as HTMLElement).insertBefore(elem, (e.target as HTMLElement).firstChild);
 			}
 
-			// this is for multiple event listeners
-			const abortController = new AbortController();
-
 			pieceMoves.forEach((m) => {
 				const elem = document.createElement("cr-square");
 				elem.className = "move-dest";
@@ -146,6 +151,7 @@ function onStart(
 				elem.style.transform = getTransformStyle(to, size);
 
 				const drop = () => {
+					console.log("drop event");
 					document.querySelectorAll(".move-dest, .selected, .last-move, .check").forEach((e) => e.remove());
 					const elem = document.createElement("cr-square");
 					elem.className = "last-move";
@@ -208,13 +214,14 @@ function onStart(
 				// elem.addEventListener("touchstart", drop);
 
 				elem.addEventListener("mouseup", drop);
-				elem.addEventListener("touchend", drop);
+				elem.addEventListener("touchend", drop, { passive: false });
 
 				const board = document.querySelector("cr-board") as HTMLElement;
 
 				if (e.touches && board) {
 					// console.log("touch moving rn");
 					const dropBoard = (e: TouchEvent) => {
+						// console.log("drop board event");
 						if (!e.isTrusted) return;
 						if (e.touches && e.touches.length > 1) return;
 						e.preventDefault();
@@ -236,7 +243,7 @@ function onStart(
 							abortController.abort();
 						}
 					};
-					board.addEventListener("touchend", dropBoard, { signal: abortController.signal });
+					board.addEventListener("touchend", dropBoard, { passive: false, signal: abortController.signal });
 				}
 
 				(e.target! as HTMLElement).insertBefore(elem, (e.target as HTMLElement).firstChild);
@@ -508,7 +515,7 @@ export default function Board({ attacks }: BoardUIProps) {
 	}, [game, isWhite]);
 
 	return (
-		<div className="w-full h-full flex flex-col sm:flex-row items-center justify-center bg-gradient-to-r from-blue-200 to-cyan-200 gap-10">
+		<div className="w-full h-full flex flex-col sm:flex-row items-center justify-center bg-gradient-to-r from-blue-200 to-cyan-200 gap-4 sm:gap-10">
 			<div
 				className="cr-cr"
 				style={{
@@ -521,7 +528,7 @@ export default function Board({ attacks }: BoardUIProps) {
 					style={{ width: `${size}px`, height: `${size}px` }}
 				>
 					<cr-container style={{ width: `${size}px`, height: `${size}px` }}>
-						<cr-board ref={ref}>
+						<cr-board class="touch-none" ref={ref}>
 							{Array.from({ length: 64 }, (_, index) => {
 								// so it is reactive
 								boardUpdate;
