@@ -32,7 +32,7 @@ export default function Dialog({ open, setOpen }: DialogArgs) {
 				game: open.game,
 			});
 		} else if (open.game === GameType.multiplayer) {
-			const ws = new WebSocket(import.meta.env.PROD ? "https://chesser-backend.williamzeng.xyz/ws" : "/api/ws");
+			        const ws = new WebSocket(import.meta.env.PROD ? "https://chesser-backend.wzeng.dev/ws" : "/api/ws");
 
 			setWs(ws);
 
