@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': {
           // this should not proxy since vercel only has 10s timeout
-          target: mode === "production" ? 'https://chesser-backend.williamzeng.xyz' : 'http://localhost:8080/',
+          target: mode === "production" ? 'https://chesser-backend.wzeng.dev' : 'http://localhost:8080/',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
           ws: true
