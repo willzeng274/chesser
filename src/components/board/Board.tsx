@@ -365,7 +365,7 @@ export default function Board({ attacks }: BoardUIProps) {
 
 	const nextStockfish = useCallback(
 		() =>
-			fetch(import.meta.env.PROD ? "https://chesser-backend.williamzeng.xyz" : "/api/", {
+			fetch(import.meta.env.PROD ? "https://chesser-backend.wzeng.dev" : "/api/", {
 				method: "POST",
 				headers: {
 					Accept: "application/json",
